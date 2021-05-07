@@ -23,7 +23,7 @@ Features:
 1. Install the [Nix IDE](https://marketplace.visualstudio.com/items?itemName=jnoortheen.nix-ide) extension for VS Code
 2. Clone this repo
 3. Run `nix build`, `nix-build`, or `RUSTC_BOOTSTRAP=1 cargo build --release` (the `--release` is important!)
-4. Copy the built binary path into Nix IDE's settings (search "nix" then edit the "server path" field)
+4. Copy the _absolute path_ to the built binary into Nix IDE's settings (search "nix" then edit the "server path" field)
 5. Make sure "Nix: Enable Language Server" is set to `true`
 6. Restart VS Code ("Reload Window" in command palette)
 
