@@ -220,9 +220,12 @@ fn handle_hover(
         }
         Err(e) => return Some((None, format!("{:?}", e))),
     };
-    let val = tree.eval().ok()?;
     let range = utils::range(content, tree.range?);
-    Some((Some(range), val.format_markdown()))
+    let val = match tree.eval() {
+        Ok(x) => x.format_markdown(),
+        Err(e) => format!("{}", e),
+    };
+    Some((Some(range), val))
 }
 
 fn handle_completion(

@@ -619,32 +619,36 @@ builtins! {
         }
         x => Err(EvalError::Unimplemented(format!("cannot cast {:?}", x))),
     }
-    // "mapAttrs" ; MapAttrs =>  |param: Gc<Tree>| Ok(Gc::new(NixValue::Lambda(NixLambda::Builtin(NixBuiltin::MapAttrs1(
-    //     Box::new(match param.eval()?.borrow() {
-    //         NixValue::Lambda(ref x) => x.clone(),
-    //         _ => panic!(),
-    //     }),
-    // )))))
-    // "mapAttrs <?>" ; MapAttrs1(_0: Box<NixLambda>) => |param: Gc<Tree>, lambda: &NixLambda| {
-    //     let attrs = match param.eval()?.borrow() {
-    //         NixValue::Map(ref x) => x.clone(),
-    //         _ => panic!(),
-    //     };
-    //     let mut new_map = HashMap::new();
-    //     for (key, value) in (&attrs).iter() {
-    //         new_map.insert(
-    //             key.clone(),
-    //             Gc::new(LazyNixValue::from_lambda_call(
-    //                 lambda.clone(),
-    //                 vec![
-    //                    Gc::new( LazyNixValue::from_concrete(NixValue::Str(key.clone()))),
-    //                     value.clone(),
-    //                 ],
-    //             )),
-    //         );
-    //     }
-    //     Ok(Gc::new(NixValue::Map(new_map)))
-    // }
+    "mapAttrs" ; MapAttrs =>  |param: Gc<Tree>| Ok(Gc::new(NixValue::Lambda(
+        NixLambda::Builtin(NixBuiltin::MapAttrs1(param)))))
+    "mapAttrs <?>" ; MapAttrs1(_0: Gc<Tree>) => |param: Gc<Tree>, lambda: &Gc<Tree>| {
+        let attrs = param.eval()?.as_map()?;
+        let mut new_map = HashMap::new();
+        for (key, value) in (&attrs).iter() {
+            let inner = Gc::new(Tree {
+                value: GcCell::new(None),
+                hash: GcCell::new(None),
+                source: TreeSource::Apply {
+                    lambda: Ok(lambda.clone()),
+                    arg: Ok(Gc::new(Tree::from_concrete(NixValue::Str(key.clone())))),
+                },
+                range: None,
+                scope: Gc::new(Scope::None)
+            });
+            let tree = Gc::new(Tree {
+                value: GcCell::new(None),
+                hash: GcCell::new(None),
+                source: TreeSource::Apply {
+                    lambda: Ok(inner),
+                    arg: Ok(value.clone()),
+                },
+                range: None,
+                scope: Gc::new(Scope::None)
+            });
+            new_map.insert(key.clone(), tree);
+        }
+        Ok(Gc::new(NixValue::Map(new_map)))
+    }
     // "any" ; Any => |param: Gc<Tree>| Ok(Gc::new(NixValue::Lambda(NixLambda::Builtin(NixBuiltin::Any1(Box::new(
     //     match param.eval()?.borrow() {
     //         NixValue::Lambda(ref x) => x.clone(),
@@ -771,10 +775,7 @@ fn json_to_nix(value: &serde_json::Value) -> NixValue {
         serde_json::Value::Object(map) => {
             let mut out_obj = HashMap::new();
             for (key, val) in map.iter() {
-                out_obj.insert(
-                    key.clone(),
-                    Gc::new(Tree::from_concrete(json_to_nix(val))),
-                );
+                out_obj.insert(key.clone(), Gc::new(Tree::from_concrete(json_to_nix(val))));
             }
             NixValue::Map(out_obj)
         }

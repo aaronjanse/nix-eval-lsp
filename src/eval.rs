@@ -526,13 +526,16 @@ impl Tree {
                     name
                 )))?
                 .eval(),
-            TreeSource::Select { from, index } => from
-                .as_ref()?
-                .eval()?
-                .as_map()?
-                .get(&index.as_ref()?.get_ident()?)
-                .ok_or(EvalError::Unexpected("missing attr".into()))?
-                .eval(),
+            TreeSource::Select { from, index } => {
+                let key = index.as_ref()?.get_ident()?;
+                let tmp = from.as_ref()?.eval()?;
+                let map = tmp.as_map()?;
+                let val = match map.get(&key) {
+                    Some(x) => x,
+                    None => return Err(EvalError::Unexpected(format!("missing attr {}", key))),
+                };
+                val.eval()
+            }
             TreeSource::BoolAnd { left, right } => {
                 if left.as_ref()?.eval()?.as_bool()? {
                     right.as_ref()?.eval()
