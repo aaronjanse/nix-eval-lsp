@@ -1,11 +1,13 @@
 # nix-eval-lsp
 
-`nix-eval-lsp` is an experimental [language server](https://langserver.org/) for [Nix](https://nixos.org) that works by evaluating code as the user interacts with it.
+`nix-eval-lsp` is an experimental [language server](https://langserver.org/) for [Nix](https://nixos.org). It provides completions and tooltips by efficiently evaluating Nix expressions as they are typed.
 
-<img src="./demo-hover.png" width="600">
-<img src="./demo-completion.png" width="600">
+<p align="center">
+    <img src="./demo.gif">
+</p>
 
-Features:
+## Features
+
 - [x] hover over an expression to see its value
 - [x] auto-complete inside expressions such as `with pkgs; [ <typing here> ]`
 - [x] goto definitions across files
@@ -18,12 +20,12 @@ Features:
 
 **Important note:** the evaluator is developed for the purpose of debugging tools only. It does not aim to correctly implement Nix in its entirety.
 
-## Usage Instructions
+## Usage
 
 1. Install the [Nix IDE](https://marketplace.visualstudio.com/items?itemName=jnoortheen.nix-ide) extension for VS Code
-2. Clone this repo
+2. `git clone https://github.com/aaronjanse/nix-eval-lsp.git && cd nix-eval-lsp`
 3. Run `nix build`, `nix-build`, or `RUSTC_BOOTSTRAP=1 cargo build --release` (the `--release` is important!)
-4. Copy the _absolute path_ to the built binary into Nix IDE's settings (search "nix" then edit the "server path" field)
+4. Copy the _absolute path_ of the built binary into Nix IDE's settings (search "nix" then edit the "server path" field)
 5. Make sure "Nix: Enable Language Server" is set to `true`
 6. Restart VS Code ("Reload Window" in command palette)
 
