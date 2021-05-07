@@ -62,7 +62,7 @@ type FileMap = HashMap<Url, (AST, String, Result<Tree, EvalError>)>;
 
 fn main() {
     panic::set_hook(Box::new(|x| {
-        error!("{}", x);
+        error!("{:?}", x);
     }));
 
     let (connection, io_threads) = Connection::stdio();
@@ -197,7 +197,7 @@ fn handle_goto(files: &FileMap, params: TextDocumentPositionParams) -> Option<Lo
     let (_, content, tree) = files.get(&params.text_document.uri)?;
     let offset = utils::lookup_pos(content, params.position)?;
     let tmp = Gc::new(tree.clone().ok()?);
-    let tree = climb_tree(&tmp, offset);
+    let tree: &Gc<Tree> = climb_tree(&tmp, offset);
     let def = tree.get_definition()?;
     let def_path = def.scope.root_path()?;
     let code = std::fs::read_to_string(&def_path).ok()?;
@@ -220,8 +220,8 @@ fn handle_hover(
         }
         Err(e) => return Some((None, format!("{:?}", e))),
     };
-    let range = utils::range(content, tree.range?);
     let val = tree.eval().ok()?;
+    let range = utils::range(content, tree.range?);
     Some((Some(range), val.format_markdown()))
 }
 

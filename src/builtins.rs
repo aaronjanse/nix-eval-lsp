@@ -97,12 +97,12 @@ builtins! {
             NixValue::Map(x) => x,
             x => return Err(EvalError::Unimplemented(format!("cannot cast {:?}", x))),
         };
-        let tmp = param.get("startSet").unwrap().eval()?;
+        let tmp = param.get("startSet").ok_or(EvalError::Parsing)?.eval()?;
         let mut items = match tmp.borrow() {
             NixValue::List(x) => x.clone(),
             x => return Err(EvalError::Unimplemented(format!("cannot cast {:?}", x))),
         };
-        let tmp = param.get("operator").unwrap().eval()?;
+        let tmp = param.get("operator").ok_or(EvalError::Parsing)?.eval()?;
         let operator = match tmp.borrow() {
             NixValue::Lambda(x) => x,
             x => return Err(EvalError::Unimplemented(format!("cannot cast {:?}", x))),
@@ -199,8 +199,8 @@ builtins! {
     "getEnv" ; GetEnv => |param: Gc<Tree>| Ok(Gc::new(NixValue::Str(
         std::env::var(param.eval()?.as_str()?).unwrap_or_else(|_| "".into()))))
     "pathExists" ; PathExists => |param: Gc<Tree>| match param.eval()?.borrow() {
-        NixValue::Path(x, y) => Ok(Gc::new(NixValue::Bool(expand_path(x.clone(), y.clone()).exists()))),
-        NixValue::Str(x) => Ok(Gc::new(NixValue::Bool(PathBuf::from_str(x).unwrap().exists()))),
+        NixValue::Path(x, y) => Ok(Gc::new(NixValue::Bool(expand_path(x.clone(), y.clone()).ok_or(EvalError::Parsing)?.exists()))),
+        NixValue::Str(x) => Ok(Gc::new(NixValue::Bool(PathBuf::from_str(x).map_err(|_| EvalError::Parsing)?.exists()))),
         x => Err(EvalError::Unimplemented(format!("cannot cast {:?}", x))),
     }
     "unsafeDiscardStringContext" ; UnsafeDiscardStringContext => |param: Gc<Tree>| {
@@ -318,12 +318,12 @@ builtins! {
                 for item in list {
                     match item.eval()?.borrow() {
                         NixValue::Map(ref map) => {
-                            let tmp = map.get("name").unwrap();
+                            let tmp = map.get("name").ok_or(EvalError::Parsing)?;
                             let key = match tmp.eval()?.borrow() {
                                 NixValue::Str(ref x) => x.clone(),
                                 x => return Err(EvalError::Unimplemented(format!("cannot cast {:?}", x))),
                             };
-                            let val = map.get("value").unwrap();
+                            let val = map.get("value").ok_or(EvalError::Parsing)?;
                             out_map.insert(key.to_string(), val.clone());
                         }
                         x => return Err(EvalError::Unimplemented(format!("cannot cast {:?}", x))),
@@ -589,7 +589,7 @@ builtins! {
     "import" ; Import => |param: Gc<Tree>| {
         match param.eval()?.borrow() {
             NixValue::Path(ref base, ref path) => {
-                let path = expand_path(base.clone(), path.clone());
+                let path = expand_path(base.clone(), path.clone()).ok_or(EvalError::Parsing)?;
                 let path = if path.is_dir() {
                     path.join("default.nix")
                 } else {
@@ -605,7 +605,7 @@ builtins! {
     "readFile" ; ReadFile => |param: Gc<Tree>| {
         match param.eval()?.borrow() {
             NixValue::Path(x, y) => {
-                let path = expand_path(x.clone(), y.clone());
+                let path = expand_path(x.clone(), y.clone()).ok_or(EvalError::Parsing)?;
                 let source = std::fs::read_to_string(path).map_err(|_| EvalError::Parsing)?;
                 Ok(Gc::new(NixValue::Str(source)))
             }

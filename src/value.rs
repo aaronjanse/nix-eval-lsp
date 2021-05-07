@@ -317,7 +317,7 @@ impl Debug for NixValue {
                             let ident = rnix::types::Ident::cast(arg).unwrap();
                             write!(f, "{}: {}", ident.as_str(), lambda.body().unwrap().text())
                         }
-                        _ => panic!(),
+                        _ => write!(f, "??"),
                     }
                 }
                 NixLambda::Builtin(builtin) => write!(f, "{:?}", builtin),

@@ -11,10 +11,10 @@ use rnix::{
 use std::str::FromStr;
 use std::{borrow::Borrow, collections::HashMap, path::PathBuf};
 
-pub fn expand_path(base: NixPathAnchor, path: String) -> PathBuf {
+pub fn expand_path(base: NixPathAnchor, path: String) -> Option<PathBuf> {
     match &base {
-        NixPathAnchor::Absolute => PathBuf::from_str(&path).unwrap(),
-        NixPathAnchor::Relative(rel) => rel.join(path),
+        NixPathAnchor::Absolute => PathBuf::from_str(&path).ok(),
+        NixPathAnchor::Relative(rel) => Some(rel.join(path)),
     }
 }
 
@@ -315,9 +315,10 @@ impl Tree {
                 NixValue::Float(x) => hasher.update(format!("{}", x)),
                 NixValue::Integer(x) => hasher.update(format!("{}", x)),
                 NixValue::Lambda(lambda) => match lambda {
-                    NixLambda::Node { lambda: _, scope: _ } => {
-                        return Err(EvalError::Unimplemented("node".to_string()))
-                    }
+                    NixLambda::Node {
+                        lambda: _,
+                        scope: _,
+                    } => return Err(EvalError::Unimplemented("node".to_string())),
                     NixLambda::Builtin(x) => hasher.update(format!("{:?}", x)),
                 },
                 NixValue::List(_) => return Err(EvalError::Unimplemented("list".to_string())),
@@ -483,7 +484,10 @@ impl Tree {
 
     fn position(&self) -> String {
         let path = match self.scope.root_path() {
-            Some(x) => format!("{:?}", x.canonicalize().unwrap()),
+            Some(x) => match x.canonicalize() {
+                Ok(y) => format!("{:?}", y),
+                Err(_) => "[unknown path]".to_string(),
+            },
             None => "[unknown path]".to_string(),
         };
         path
