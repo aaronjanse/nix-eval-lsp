@@ -10,7 +10,7 @@ Features:
 - [x] auto-complete inside expressions such as `with pkgs; [ <typing here> ]`
 - [x] goto definitions across files
 - [ ] snippets for common Nix expressions
-- [ ] clickable on paths and urls
+- [ ] clickable paths and urls
 - [ ] auto-formatting using `nixpkgs-fmt`
 - [ ] caching of lambda parameters to make `callPackage` derivations easier to write
 - [ ] auto-complete for lambda arguments, with documentation comments extracted from source code
@@ -22,7 +22,7 @@ Features:
 
 1. Install the [Nix IDE](https://marketplace.visualstudio.com/items?itemName=jnoortheen.nix-ide) extension for VS Code
 2. Clone this repo
-3. Run `nix build`, `nix-build`, or `cargo build --release` (the `--release` is important!)
+3. Run `nix build`, `nix-build`, or `RUSTC_BOOTSTRAP=1 cargo build --release` (the `--release` is important!)
 4. Copy the built binary path into Nix IDE's settings (search "nix" then edit the "server path" field)
 
 ## Try it out
