@@ -1,0 +1,17 @@
+[package]
+name = "nix-eval-lsp"
+version = "0.0.1"
+authors = ["Aaron Janse"]
+edition = "2018"
+
+[dependencies]
+rnix = "0.9.0"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+gc = { version = "0.4", features = ["derive"] }
+posix-regex = "0.1.1"
+log = "0.4.8"
+lsp-server = "0.3.1"
+lsp-types = { version = "0.68.1", features = ["proposed"] }
+rowan = "0.12.6"
+sha2 = "0.9.3"
