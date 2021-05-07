@@ -62,7 +62,14 @@ impl Scope {
                 out
             }
             Scope::With { parent, contents } => {
-                let map = contents.eval().unwrap().as_map().unwrap();
+                let eval = match contents.eval() {
+                    Ok(x) => x,
+                    Err(_) => return vec![],
+                };
+                let map = match eval.as_map() {
+                    Ok(x) => x,
+                    Err(_) => return vec![],
+                };
                 let mut out: Vec<String> = map.keys().cloned().collect();
                 out.extend(parent.list());
                 out
