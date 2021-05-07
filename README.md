@@ -2,6 +2,9 @@
 
 `nix-eval-lsp` is a [language server](https://langserver.org/) for [Nix](https://nixos.org) that works by evaluating code as the user interacts with it.
 
+<img src="./demo-hover.png" width="400">
+<img src="./demo-completion.png" width="400">
+
 Features:
 - [x] hover over an expression to see its value
 - [x] auto-complete inside expressions such as `with pkgs; [ <typing here> ]`
