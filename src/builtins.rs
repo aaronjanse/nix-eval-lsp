@@ -248,6 +248,14 @@ builtins! {
             x => Err(EvalError::Unimplemented(format!("cannot cast {:?}", x))),
         }
     }
+    "hasAttr" ; HasAttr => |param: Gc<Tree>|  {
+        Ok(Gc::new(NixValue::Lambda(NixLambda::Builtin(NixBuiltin::HasAttr1(param)))))
+    }
+    "hasAttr <?>" ; HasAttr1(_0: GcLazy) => |param: Gc<Tree>, index: &GcLazy| {
+        let map = param.eval()?.as_map()?;
+        let key = index.eval()?.as_str()?;
+        Ok(Gc::new(NixValue::Bool(map.contains_key(&key))))
+    }
     "elem" ; Elem => |param: Gc<Tree>|  {
         Ok(Gc::new(NixValue::Lambda(NixLambda::Builtin(NixBuiltin::Elem1(param)))))
     }
