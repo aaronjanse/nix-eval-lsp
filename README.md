@@ -24,6 +24,8 @@ Features:
 2. Clone this repo
 3. Run `nix build`, `nix-build`, or `RUSTC_BOOTSTRAP=1 cargo build --release` (the `--release` is important!)
 4. Copy the built binary path into Nix IDE's settings (search "nix" then edit the "server path" field)
+5. Make sure "Nix: Enable Language Server" is set to `true`
+6. Restart VS Code ("Reload Window" in command palette)
 
 ## Try it out
 
