@@ -1,5 +1,7 @@
 # nix-eval-lsp
 
+**Still use [nix-community/rnix-lsp](https://github.com/nix-community/rnix-lsp). This repo is a work in progress.**
+
 `nix-eval-lsp` is an experimental [language server](https://langserver.org/) for [Nix](https://nixos.org). It provides completions and tooltips by efficiently evaluating Nix expressions as they are typed.
 
 <p align="center">
