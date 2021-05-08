@@ -11,12 +11,12 @@
 - [x] hover over an expression to see its value
 - [x] auto-complete inside expressions such as `with pkgs; [ <typing here> ]`
 - [x] goto definitions across files
-- [ ] snippets for common Nix expressions
-- [ ] clickable paths and urls
+- [x] clickable paths and urls
 - [ ] auto-formatting using `nixpkgs-fmt`
+- [ ] helpful documentation for builtins
 - [ ] caching of lambda parameters to make `callPackage` derivations easier to write
 - [ ] auto-complete for lambda arguments, with documentation comments extracted from source code
-- [ ] documentation for builtins
+- [ ] snippets for common Nix expressions
 
 **Important note:** the evaluator is developed for the purpose of debugging tools only. It does not aim to correctly implement Nix in its entirety.
 

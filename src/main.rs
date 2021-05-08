@@ -13,12 +13,9 @@ use gc::{Finalize, Trace};
 use gc::{Gc, GcCell};
 use log::{error, warn};
 use lsp_server::{Connection, ErrorCode, Message, Request, RequestId, Response};
-use lsp_types::{
-    notification::*,
-    request::{Completion, GotoDefinition, HoverRequest},
-    *,
-};
+use lsp_types::{*, notification::*, request::{Completion, DocumentLinkRequest, GotoDefinition, HoverRequest}};
 use rnix::parser::*;
+use rnix::types::TypedNode;
 use rnix::types::Wrapper;
 use scope::*;
 use std::error::Error;
@@ -69,6 +66,10 @@ fn main() {
     let capabilities = serde_json::to_value(&ServerCapabilities {
         completion_provider: Some(CompletionOptions::default()),
         definition_provider: Some(true),
+        document_link_provider: Some(DocumentLinkOptions {
+            resolve_provider: Some(false),
+            work_done_progress_options: WorkDoneProgressOptions::default(),
+        }),
         hover_provider: Some(true),
         text_document_sync: Some(TextDocumentSyncCapability::Options(
             TextDocumentSyncOptions {
@@ -109,7 +110,10 @@ fn main_loop(connection: &Connection) -> Result<(), Box<dyn Error + Sync + Send>
                     return Ok(());
                 }
 
-                if let Some((id, params)) = cast::<GotoDefinition>(&req) {
+                if let Some((id, params)) = cast::<DocumentLinkRequest>(&req) {
+                    let links = handle_links(&files, params).unwrap_or_default();
+                    reply(Response::new_ok(id, links));
+                } else if let Some((id, params)) = cast::<GotoDefinition>(&req) {
                     if let Some(loc) = handle_goto(&files, params) {
                         reply(Response::new_ok(id, loc))
                     } else {
@@ -134,7 +138,7 @@ fn main_loop(connection: &Connection) -> Result<(), Box<dyn Error + Sync + Send>
                         }
                     }
                 } else if let Some((id, params)) = cast::<Completion>(&req) {
-                    let completions = handle_completion(&files, &params.text_document_position)
+                    let completions = handle_completion(&files, params.text_document_position)
                         .unwrap_or_default();
                     reply(Response::new_ok(id, completions));
                 } else {
@@ -230,7 +234,7 @@ fn handle_hover(
 
 fn handle_completion(
     files: &FileMap,
-    params: &TextDocumentPositionParams,
+    params: TextDocumentPositionParams,
 ) -> Option<Vec<CompletionItem>> {
     let (_, content, tree) = files.get(&params.text_document.uri)?;
     let offset = utils::lookup_pos(content, params.position)?;
@@ -258,6 +262,47 @@ fn handle_completion(
         }
     }
     Some(completions)
+}
+
+fn handle_links(files: &FileMap, params: DocumentLinkParams) -> Option<Vec<DocumentLink>> {
+    let here_uri = params.text_document.uri;
+    let here_path_file = here_uri.to_file_path().ok()?;
+    let here_path_dir = here_path_file.parent()?;
+    let (ast, content, _) = files.get(&here_uri)?;
+    let mut links = vec![];
+    for child in ast.node().descendants() {
+        let text_range = child.text_range();
+        let value = match rnix::types::Value::cast(child).and_then(|x| x.to_value().ok()) {
+            Some(x) => x,
+            None => continue,
+        };
+        let (anchor, path) = match value {
+            rnix::value::Value::Path(x, y) => (x,y),
+            _ => continue,
+        };
+        let path = match anchor {
+            rnix::value::Anchor::Absolute => PathBuf::from_str(&path),
+            rnix::value::Anchor::Relative => Ok(here_path_dir.join(path)),
+            _ => continue,
+        };
+        let path = match path {
+            Ok(x) => x,
+            Err(_) => continue,
+        };
+        let path = if path.is_dir() {
+            path.join("default.nix")
+        } else {
+            path
+        };
+        if let Ok(url) = Url::from_file_path(path) {
+            links.push(DocumentLink {
+                target: url,
+                range: utils::range(content, text_range),
+                tooltip: None,
+            })
+        }
+    }
+    Some(links)
 }
 
 fn climb_tree(here: &Gc<Tree>, offset: usize) -> &Gc<Tree> {
