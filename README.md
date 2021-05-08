@@ -42,3 +42,7 @@ with pkgs; [
   htop hello
 ]
 ```
+
+## Credits
+
+Huge thank you to [@jd91mZM2](https://github.com/jd91mZM2) for [nix-community/rnix-parser](https://github.com/nix-community/rnix-parser).
