@@ -25,7 +25,7 @@
 1. Install the [Nix IDE](https://marketplace.visualstudio.com/items?itemName=jnoortheen.nix-ide) extension for VS Code
 2. `git clone https://github.com/aaronjanse/nix-eval-lsp.git && cd nix-eval-lsp`
 3. Run `nix build`, `nix-build`, or `RUSTC_BOOTSTRAP=1 cargo build --release` (the `--release` is important!)
-4. Copy the _absolute path_ of the built binary into Nix IDE's settings (search "nix" then edit the "server path" field)
+4. Copy the absolute path of the built binary into Nix IDE's settings (search "nix" then edit the "server path" field)
 5. Make sure "Nix: Enable Language Server" is set to `true`
 6. Restart VS Code ("Reload Window" in command palette)
 
