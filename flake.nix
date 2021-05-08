@@ -10,9 +10,9 @@
         ({ stdenv, lib, rustPlatform, fetchFromGitHub }:
         rustPlatform.buildRustPackage {
           pname = "nix-eval-lsp";
-          version = (builtins.fromTOML (builtins.readFile ./Cargo.toml)).package.version;
+          version = "0.1.0";
           src = ./.;
-          cargoSha256 = "sha256-5J/joDCZ4U8AQgTV91pa+vDJLQlPGWLWHu/rnNxI8Zc=";
+          cargoSha256 = "sha256-OoHGx9RLWahJ11z9EmnnJDj/b2GJhQgJslTmSVuxc7Y=";
           RUSTC_BOOTSTRAP = 1;
         }) { };
       defaultPackage = self.packages.${system}.nix-eval-lsp;
