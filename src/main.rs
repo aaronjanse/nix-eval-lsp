@@ -199,7 +199,7 @@ where
 
 fn handle_goto(files: &FileMap, params: TextDocumentPositionParams) -> Option<Location> {
     let (_, content, tree) = files.get(&params.text_document.uri)?;
-    let offset = utils::lookup_pos(content, params.position)?;
+    let offset = utils::pos_to_offset(content, params.position)?;
     let tmp = Gc::new(tree.clone().ok()?);
     let tree: &Gc<Tree> = climb_tree(&tmp, offset);
     let def = tree.get_definition()?;
@@ -216,7 +216,7 @@ fn handle_hover(
     params: TextDocumentPositionParams,
 ) -> Option<(Option<Range>, String)> {
     let (_, content, tree) = files.get(&params.text_document.uri)?;
-    let offset = utils::lookup_pos(content, params.position)?;
+    let offset = utils::pos_to_offset(content, params.position)?;
     let tree = match tree {
         Ok(x) => {
             let tmp = Gc::new(x.clone());
@@ -237,7 +237,7 @@ fn handle_completion(
     params: TextDocumentPositionParams,
 ) -> Option<Vec<CompletionItem>> {
     let (_, content, tree) = files.get(&params.text_document.uri)?;
-    let offset = utils::lookup_pos(content, params.position)?;
+    let offset = utils::pos_to_offset(content, params.position)?;
     let tree = match tree {
         Ok(x) => {
             let tmp = Gc::new(x.clone());
