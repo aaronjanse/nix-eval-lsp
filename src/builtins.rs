@@ -430,8 +430,8 @@ builtins! {
         NixValue::Integer(x) => Ok(Gc::new(NixValue::Str(format!("{}", x)))),
         NixValue::Float(x) => Ok(Gc::new(NixValue::Str(format!("{}", x)))),
         // FIXME: incorrect!
-        NixValue::Path(x, y) => Ok(Gc::new(NixValue::Str(
-            format!("/nix/store/{:?}", expand_path(x.clone(), y.clone()))))),
+        NixValue::Path(_, _) => Ok(Gc::new(NixValue::Str(
+            "/nix/store/00000000000000000000000000000000-fake-path".to_string()))),
         x => Err(EvalError::Unimplemented(format!("cannot cast {:?}", x))),
     }
     "removeAttrs" ; RemoveAttrs => |param: Gc<Tree>| {
