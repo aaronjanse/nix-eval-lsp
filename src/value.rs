@@ -142,7 +142,6 @@ impl NixValue {
                             let b: Gc<NixValue> = valy.eval()?;
                             if !a.equals(&b)? {
                                 println!("MISMATCH: {}", key);
-                                // println!("{:?} vs {:?} ; {}", a, b, a == b);
                                 return Ok(false);
                             }
                         }

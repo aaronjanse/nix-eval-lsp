@@ -8,7 +8,6 @@ use gc::{Finalize, Gc, GcCell, Trace};
 use rnix::types::{TokenWrapper, TypedNode, Wrapper};
 use std::{borrow::Borrow, collections::HashMap, path::PathBuf, str::FromStr};
 
-// Gc::new(Tree { })
 #[macro_export]
 macro_rules! maybe_push {
     ($map:ident ; $description:expr ; $kind:ident) => {
@@ -137,7 +136,6 @@ builtins! {
                 range: None,
                 scope: Gc::new(Scope::None)
             });
-            // out.push(Gc::new(LazyNixValue::from_lambda_call(lambda.clone(), vec![item.clone()])));
             out.push(tree);
         }
         Ok(Gc::new(NixValue::List(out)))
@@ -303,7 +301,6 @@ builtins! {
     "genList <?>" ; GenList1(_0: Gc<Tree>) => |param: Gc<Tree>, lambda: &Gc<Tree>| {
         let num = param.eval()?.as_int()?;
         let mut out = vec![];
-        // let lambda = lambda.eval()?.as_lambda()?;
         for i in 0..num {
             let tree = Gc::new(Tree {
                 value: GcCell::new(None),

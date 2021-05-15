@@ -276,11 +276,6 @@ impl Tree {
         }
     }
 
-    // pub fn format_markdown(&self) -> Option<String> {
-    //     let tmp = self.value.borrow();
-    //     tmp.as_ref().map(|x| x.format_markdown())
-    // }
-
     pub fn completions(&self) -> Option<(String, Vec<String>, TextRange)> {
         match &self.source {
             TreeSource::Ident { name } => Some((name.clone(), self.scope.list(), self.range?)),
@@ -302,7 +297,6 @@ impl Tree {
     }
 
     fn hash_uncached(&self) -> Result<String, EvalError> {
-        // println!("{:?} {}", self, self.position());
         use sha2::{Digest, Sha256};
         let mut hasher = Sha256::new();
         hasher.update(b"(");
@@ -761,9 +755,6 @@ impl Tree {
             TreeSource::StringInterpol { parts } => {
                 let mut out = vec![];
                 for part in parts {
-                    // if let TreeSource::Literal { .. } = part.as_ref()?.source {
-                    //     continue;
-                    // }
                     out.push(part);
                 }
                 out
@@ -793,10 +784,6 @@ impl Tree {
             Ident { ref name } => Ok(name.clone()),
             Dynamic { ref inner } => inner.as_ref()?.eval()?.as_str(),
             Literal { ref value } => value.as_str(),
-            // InferredIdent { ref name, .. } => Ok(name.clone()),
-            // Literal { ref value } => Ok(value.as_str()?.clone()),
-            // StringInterpol { .. } => Ok(self.eval()?.as_str()?.clone()),
-            // Dynamic { ref inner } => Ok(inner.eval()?.as_str()?.clone()),
             other => Err(EvalError::Unexpected(format!(
                 "cannot get ident from {:?}",
                 other
@@ -809,7 +796,6 @@ impl Tree {
         match &self.source {
             Ident { name } => Ok(vec![name.clone()]),
             Literal { ref value } => Ok(vec![value.as_str()?]),
-            // StringInterpol { .. } => Ok(vec![self.eval()?.as_str()?.clone()]),
             Dynamic { ref inner } => Ok(vec![inner.as_ref()?.eval()?.as_str()?]),
             Select { from, index } => Ok({
                 let mut out = from.as_ref()?.get_idents()?;
