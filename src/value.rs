@@ -248,18 +248,6 @@ impl Debug for NixValue {
                 &NixLambda::Node { lambda, scope: _ } => {
                     use rnix::SyntaxKind::*;
                     let arg = lambda.arg().unwrap();
-                    // let root: &Scope = scope.borrow();
-                    // writeln!(
-                    //     f,
-                    //     "{}:{:?}",
-                    //     root.root_path()
-                    //         .unwrap()
-                    //         .canonicalize()
-                    //         .unwrap()
-                    //         .to_str()
-                    //         .unwrap(),
-                    //     arg.text_range()
-                    // )?;
                     match arg.kind() {
                         NODE_PATTERN => {
                             let mut current_comment = "".to_string();
@@ -298,20 +286,6 @@ impl Debug for NixValue {
                             }
 
                             Ok(())
-                            // let mut map = HashMap::new();
-                            // let pattern = rnix::types::Pattern::cast(arg.clone()).unwrap();
-                            // for entry in pattern.entries() {
-                            //     let tmp = entry.name().unwrap();
-                            //     let name = tmp.as_str();
-                            //     let value = entry.default().is_some();
-                            //     map.insert(
-                            //         name.to_string(),
-                            //         Gc::new(LazyNixValue::from_concrete(NixValue::Bool(value))),
-                            //     );
-                            // }
-                            // // Ok(Gc::new(NixValue::Map(map)))
-                            // todo!()
-                            // todo!()
                         }
                         NODE_IDENT => {
                             let ident = rnix::types::Ident::cast(arg).unwrap();
