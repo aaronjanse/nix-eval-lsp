@@ -1,4 +1,3 @@
-// use crate::builtins::NixBuiltin;
 use crate::eval::Tree;
 use crate::scope::*;
 use crate::{builtins::NixBuiltin, EvalError};
