@@ -177,7 +177,7 @@ impl NixValue {
                     Ok(true)
                 }
             }
-            _ => Ok(false), // (x, y) => panic!("{:?} ?? {:?}", x,y),
+            _ => Ok(false),
         }
     }
 

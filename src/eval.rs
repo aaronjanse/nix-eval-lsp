@@ -329,34 +329,6 @@ impl Tree {
                 }
                 NixValue::Str(x) => hasher.update(x),
             },
-            // TreeSource::Assert { condition, body } => {
-            //     return Err(EvalError::Unimplemented("assert".to_string()))
-            // }
-            // TreeSource::IfElse {
-            //     condition,
-            //     true_body,
-            //     false_body,
-            // } => {
-            //     hasher.update(condition.as_ref()?.hash()?);
-            //     hasher.update(true_body.as_ref()?.hash()?);
-            //     hasher.update(false_body.as_ref()?.hash()?);
-            // }
-            // TreeSource::Paren { inner } => {
-            //     hasher.update("paren");
-            //     hasher.update(inner.as_ref()?.hash()?);
-            // }
-            // // TreeSource::Dynamic { inner } => {
-            // //     hasher.update("dynamic");
-            // //     hasher.update(inner.as_ref().ok()?.hash()?);
-            // // }
-            // // TreeSource::LetIn {
-            // //     inherits,
-            // //     definitions,
-            // //     body,
-            // // } => {
-            // //     hasher.update("letin");
-            // //     hasher.update(body.as_ref().ok()?.hash()?);
-            // // }
             TreeSource::LetAttr { path: _, value } => {
                 hasher.update("letattr");
                 hasher.update(value.as_ref()?.hash()?);
@@ -368,46 +340,6 @@ impl Tree {
                     None => return Err(EvalError::Unimplemented("legacy".to_string())),
                 });
             }
-            // // TreeSource::Select { from, index } => {
-            // //     hasher.update("select");
-            // //     hasher.update(from.as_ref().ok()?.hash()?);
-            // //     hasher.update("using");
-            // //     hasher.update(index.as_ref().ok()?.hash()?);
-            // // }
-            // TreeSource::BinOp { op, left, right } => {
-            //     hasher.update("(");
-            //     match op {
-            //         BinOpKind::Concat => hasher.update("++"),
-            //         BinOpKind::Update => hasher.update("//"),
-            //         BinOpKind::Add => hasher.update("+"),
-            //         BinOpKind::Sub => hasher.update("-"),
-            //         BinOpKind::Mul => hasher.update("*"),
-            //         BinOpKind::Div => hasher.update("/"),
-            //         BinOpKind::Equal => hasher.update("=="),
-            //         BinOpKind::Less => hasher.update("<"),
-            //         BinOpKind::LessOrEq => hasher.update("<="),
-            //         BinOpKind::More => hasher.update(">"),
-            //         BinOpKind::MoreOrEq => hasher.update(">="),
-            //         BinOpKind::NotEqual => hasher.update("!="),
-            //     }
-            //     hasher.update(left.as_ref().ok()?.hash()?);
-            //     hasher.update(right.as_ref().ok()?.hash()?);
-            //     hasher.update(")");
-            // }
-            // TreeSource::BoolAnd { left, right } => {
-            //     hasher.update("and");
-            //     hasher.update(left.as_ref().ok()?.hash()?);
-            //     hasher.update(right.as_ref().ok()?.hash()?);
-            // }
-            // TreeSource::BoolOr { left, right } => return None,
-            // TreeSource::Implication { left, right } => return None,
-            // TreeSource::With { value, body } => {
-            //     hasher.update("with");
-            //     hasher.update(value.as_ref().ok()?.hash()?);
-            //     hasher.update(";");
-            //     hasher.update(body.as_ref().ok()?.hash()?);
-            // }
-            // TreeSource::List { items } => return None,
             TreeSource::Apply { lambda, arg } => {
                 hasher.update("apply");
                 hasher.update(lambda.as_ref()?.hash()?);
@@ -421,23 +353,7 @@ impl Tree {
                 for inherit in inherits {
                     hasher.update(inherit.as_ref()?.hash()?);
                 }
-                // for definition in definitions {
-                //     hasher.update(definition.as_ref()?.hash()?);
-                // }
             }
-            // TreeSource::MapAttr { path, value } => {
-            //     hasher.update("attr");
-            //     hasher.update(value.as_ref()?.hash()?);
-            // }
-            // TreeSource::StringInterpol { parts } => return None,
-            // TreeSource::UnaryInvert { value } => {
-            //     hasher.update("!");
-            //     hasher.update(value.as_ref().ok()?.hash()?);
-            // }
-            // TreeSource::UnaryNegate { value } => {
-            //     hasher.update("-");
-            //     hasher.update(value.as_ref().ok()?.hash()?);
-            // }
             _ => return Err(EvalError::Unimplemented("other".to_string())),
         }
         hasher.update(b")");
