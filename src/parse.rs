@@ -144,7 +144,7 @@ impl Tree {
                             from_node.inner().ok_or(EvalError::Parsing)?,
                             new_scope.clone(),
                         )?;
-                        inherits.push(Ok(from.clone())); // allow handling inside the parenthesis
+                        inherits.push(Ok(from.clone())); // allow handling inside the parentheses
                         for ident in inherit.idents() {
                             let name = ident.as_str();
                             let index = Gc::new(Tree {
