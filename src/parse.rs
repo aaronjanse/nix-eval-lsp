@@ -507,73 +507,13 @@ impl Tree {
             }
             NODE_LAMBDA => {
                 let node_lambda = Lambda::cast(node).ok_or(EvalError::Parsing)?;
-                // let arg = node_lambda.arg().ok_or(EvalError::Parsing)?;
-                // let mut infer_map = HashMap::new();
-                // match arg.kind() {
-                //     NODE_PATTERN => {
-                //         let pattern = Pattern::cast(arg).ok_or(EvalError::Parsing)?;
-                //         if let Some(at) = pattern.at() {
-                //             let name = at.as_str().to_string();
-                //             infer_map.insert(
-                //                 name.clone(),
-                //                 Gc::new(Tree {
-                //                     value: GcCell::new(None),
-                //                     source: TreeSource::InferredIdent { name },
-                //                     range: Some(at.node().text_range()),
-                //                     scope: Gc::new(Scope::None),
-                //                     hash: GcCell::new(None),
-                //                 }),
-                //             );
-                //         }
-                //         if pattern.entries().next().is_some() {
-                //             for entry in pattern.entries() {
-                //                 let key = entry.name().ok_or(EvalError::Parsing)?;
-                //                 let name = key.as_str().to_string();
-                //                 infer_map.insert(
-                //                     name.clone(),
-                //                     Gc::new(Tree {
-                //                         value: GcCell::new(None),
-                //                         source: TreeSource::InferredIdent {
-                //                             name: name.to_string(),
-                //                         },
-                //                         range: Some(key.node().text_range()),
-                //                         scope: Gc::new(Scope::None),
-                //                         hash: GcCell::new(None),
-                //                     }),
-                //                 );
-                //             }
-                //         }
-                //     }
-                //     NODE_IDENT => {
-                //         let name = to_string(&arg, scope.clone())?;
-                //         infer_map.insert(
-                //             name.clone(),
-                //             Gc::new(Tree {
-                //                 value: GcCell::new(None),
-                //                 source: TreeSource::InferredIdent { name },
-                //                 range: Some(arg.text_range()),
-                //                 scope: Gc::new(Scope::None),
-                //                 hash: GcCell::new(None),
-                //             }),
-                //         );
-                //     }
-                //     x => unimplemented!("UNEXPECTED {:?}", x),
-                // }
-
-                // let new_scope = Gc::new(Scope::Normal {
-                //     parent: scope.clone(),
-                //     contents: GcCell::new(infer_map),
-                // });
-
-                // let node_body = node_lambda.body().ok_or(EvalError::Parsing)?;
-
                 TreeSource::Lambda {
                     literal: Gc::new(NixValue::Lambda(NixLambda::Node {
-                        lambda: node_lambda.clone(),
+                        lambda: node_lambda,
                         scope: scope.clone(),
                     })),
                     params: vec![],
-                    body: Err(EvalError::Parsing), // recurse(node_lambda.body().ok_or(EvalError::Parsing)?)
+                    body: Err(EvalError::Parsing),
                 }
             }
             _ => TreeSource::Legacy { syntax: node },
