@@ -90,11 +90,8 @@ impl Scope {
                 "null" => NixValue::Null,
                 "derivation" => {
                     let source = include_str!("./derivation.nix");
-                    let root = rnix::parse(&source).root().inner().unwrap();
-                    let tmp = Tree::parse(root, Gc::new(Scope::None))
-                        .unwrap()
-                        .eval()
-                        .unwrap();
+                    let root = rnix::parse(&source).root().inner()?;
+                    let tmp = Tree::parse(root, Gc::new(Scope::None)).ok()?.eval().ok()?;
                     let val: &NixValue = tmp.borrow();
                     val.clone()
                 }
